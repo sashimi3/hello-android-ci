@@ -49,19 +49,6 @@ jobs:
           - Second Change
         draft: false
         prerelease: true
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-#        commitish: main
-
-#    - name: Upload aab
-#      with:
-#        name: aab
-#        path: ./app/build/outputs/bundle/release/*.aab
-#      uses: actions/upload-artifact@v2
-#    - name: Upload apk
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: apk
-#        path: ./app/build/outputs/apk/release/*.apk
 
     - name: Upload Release Asset aab
 #      id: upload-release-asset

@@ -5,9 +5,14 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+#
+#    # Sequence of patterns matched against refs/tags
+#    tags:
+#      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
+    name: Build App
 
     runs-on: ubuntu-latest
 
@@ -24,8 +29,62 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-      
+
     - name: Build release apk with Gradle
       run: ./gradlew assembleRelease
     - name: Build release aab with Gradle
       run: ./gradlew :app:bundleRelease
+
+#    - name: Upload aab
+#      with:
+#        name: aab
+#        path: ./app/build/outputs/bundle/release/*.aab
+#      uses: actions/upload-artifact@v2
+#    - name: Upload apk
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: apk
+#        path: ./app/build/outputs/apk/release/*.apk
+
+    - name: Upload Release Asset aab
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#        asset_path: ./dist/hogehoge_${{ env.RELEASE_VERSION }}_darwin_amd64.tar.gz
+#        asset_name: hogehoge_${{ env.RELEASE_VERSION }}_darwin_amd64.tar.gz
+        asset_path: ./app/build/outputs/bundle/release/app-release.aab
+        asset_name: app-release.aab
+        asset_content_type: application/gzip
+
+    - name: Upload Release Asset apk
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./app/build/outputs/apk/release/app-release-unsigned.apk
+        asset_name: app-release-unsigned.apk
+        asset_content_type: application/gzip
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: true
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        commitish: main
+
+

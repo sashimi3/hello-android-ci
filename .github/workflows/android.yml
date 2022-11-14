@@ -2,14 +2,13 @@ name: Android CI
 
 on:
   push:
-#    branches: [ "main" ]
-#  pull_request:
-#    branches: [ "main" ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-    # Sequence of patterns matched against refs/tags
-    tags:
+#    # Sequence of patterns matched against refs/tags
+#    tags:
 #      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-      - '*'
 
 jobs:
   build:
@@ -36,13 +35,18 @@ jobs:
     - name: Build release aab with Gradle
       run: ./gradlew :app:bundleRelease
 
+    - name: Set commit sha
+      id: sha
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
+#        tag_name: ${{ github.ref }}
+        tag_name: ${{ steps.sha.outputs.sha_short }} # refs/tags/refs/heads/main とかが入ると詰むのでコミットハッシュを使っておく
         release_name: Release ${{ github.ref }}
         body: |
           Changes in this Release

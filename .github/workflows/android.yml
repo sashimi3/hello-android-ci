@@ -77,6 +77,14 @@ jobs:
         asset_name: app-release-unsigned.apk
         asset_content_type: application/gzip
 
-
-
-
+    # artifactも試してみる
+    - name: Upload aab file
+      uses: actions/upload-artifact@v1
+      with:
+        name: app-release.aab
+        path: ./app/build/outputs/bundle/release/app-release.aab
+    - name: Upload apk file
+      uses: actions/upload-artifact@v1
+      with:
+        name: app-release-unsigned.apk
+        path: ./app/build/outputs/apk/release/app-release-unsigned.apk
